@@ -1,62 +1,206 @@
 version: '2.1'
 services:
   rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
     ports:
-      - 5672:5672
+      - 15672:15672
+    networks:
+      - spring-connect-net
 
   config:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
     build: config
+    restart: always
     ports:
       - 8888:8888
+    networks:
+      - spring-connect-net
 
   registry:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
     build: registry
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
+    ports:
+      - 8791:8791
+    networks:
+      - spring-connect-net
+
 
   gateway:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
     build: gateway
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
+    ports:
+      - 80:4000
+    networks:
+      - spring-connect-net
+
+
+  auth-mysql:
+    image: "mysql:5.7"
+    ports:
+      - "4306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=simon
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=piggymetrics
+    container_name: auth-mysql
+    volumes:
+      - /Users/simon_li/piggymetrics/mysqldata/auth:/var/lib/mysql    #set the database store path
+    networks:
+      - spring-connect-net
+
 
   auth-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
+      NOTIFICATION_SERVICE_PASSWORD: 123456
+      STATISTICS_SERVICE_PASSWORD: 123456
+      ACCOUNT_SERVICE_PASSWORD: 123456
+      MONGODB_PASSWORD: 123456
     build: auth-service
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
     ports:
       - 5000:5000
+    networks:
+      - spring-connect-net
 
-  auth-mongodb:
-    build: mongodb
-    ports:
-      - 25000:27017
+
 
   account-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
+      ACCOUNT_SERVICE_PASSWORD: 123456
+      MONGODB_PASSWORD: 123456
     build: account-service
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
     ports:
       - 6000:6000
+    networks:
+      - spring-connect-net
 
-  account-mongodb:
-    build: mongodb
+
+  account-mysql:
+    image: "mysql:5.7"
     ports:
-      - 26000:27017
+      - "5306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=simon
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=piggymetrics
+    container_name: account-mysql
+    volumes:
+      - /Users/simon_li/piggymetrics/mysqldata/account:/var/lib/mysql    #set the database store path
+    networks:
+      - spring-connect-net
 
   statistics-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
+      MONGODB_PASSWORD: 123456
+      STATISTICS_SERVICE_PASSWORD: 123456
     build: statistics-service
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
     ports:
       - 7000:7000
+    networks:
+      - spring-connect-net
 
-  statistics-mongodb:
-    build: mongodb
+
+  statistics-mysql:
+    image: "mysql:5.7"
     ports:
-      - 27000:27017
+      - "6306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=simon
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=piggymetrics
+    container_name: statistics-mysql
+    volumes:
+      - /Users/simon_li/piggymetrics/mysqldata/statistic:/var/lib/mysql    #set the database store path
+    networks:
+      - spring-connect-net
 
   notification-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
+      MONGODB_PASSWORD: 123456
+      NOTIFICATION_SERVICE_PASSWORD: 123456
     build: notification-service
+    restart: always
+    depends_on:
+      config:
+        condition: service_healthy
     ports:
-      - 8000:8000
+      - 8099:8099
+    networks:
+      - spring-connect-net
 
-  notification-mongodb:
-    build: mongodb
+
+  notification-mysql:
+    networks:
+      - spring-connect-net
+    image: "mysql:5.7"
     ports:
-      - 28000:27017
+      - "7306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=simon
+      - MYSQL_PASSWORD=123456
+      - MYSQL_DATABASE=piggymetrics
+    container_name: notification-mysql
+    volumes:
+      - /Users/simon_li/piggymetrics/mysqldata/notification:/var/lib/mysql    #set the database store path
 
   monitoring:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
     build: monitoring
+    restart: always
+    ports:
+      - 9000:8080
+    depends_on:
+        config:
+          condition: service_healthy
+    networks:
+      - spring-connect-net
 
   turbine-stream-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: 123456
     build: turbine-stream-service
+    restart: always
+    ports:
+      - 8989:8989
+    depends_on:
+      config:
+        condition: service_healthy
+    networks:
+      - spring-connect-net
+
+
+networks:
+  spring-connect-net:
+    driver: bridge

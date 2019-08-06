@@ -24,14 +24,18 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void create(User user) {
 
-		Optional<User> existing = repository.findById(user.getUsername());
-		existing.ifPresent(it-> {throw new IllegalArgumentException("user already exists: " + it.getUsername());});
+		User user1 = repository.findByUserName(user.getUsername());
+		if (user1 != null) {
+			log.error("user already exists:", user1.getUserName());
+			throw new IllegalArgumentException("user already exists: " + user.getUserName());
+		}
 
-		String hash = encoder.encode(user.getPassword());
-		user.setPassword(hash);
+		String hash = encoder.encode(user.getPassWord());
+
+		user.setPassWord(hash);
 
 		repository.save(user);
 
-		log.info("new user has been created: {}", user.getUsername());
+		log.info("new user has been created: {}", user.getUserName());
 	}
 }

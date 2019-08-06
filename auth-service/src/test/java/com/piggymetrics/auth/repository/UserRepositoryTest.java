@@ -12,8 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataMongoTest
@@ -26,13 +25,13 @@ public class UserRepositoryTest {
 	public void shouldSaveAndFindUserByName() {
 
 		User user = new User();
-		user.setUsername("name");
-		user.setPassword("password");
+		user.setUserName("name");
+		user.setPassWord("password");
 		repository.save(user);
 
-		Optional<User> found = repository.findById(user.getUsername());
-		assertTrue(found.isPresent());
-		assertEquals(user.getUsername(), found.get().getUsername());
-		assertEquals(user.getPassword(), found.get().getPassword());
+		User user1 = repository.findByUserName(user.getUserName());
+		assertNull(user1);
+		assertEquals(user.getUsername(), user1.getUsername());
+		assertEquals(user.getPassword(), user1.getPassword());
 	}
 }

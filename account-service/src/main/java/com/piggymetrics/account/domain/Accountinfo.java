@@ -7,28 +7,30 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
-
+@Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Account {
+public class Accountinfo {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public int id;
 
-
+	@Column
 	private String name;
 
-
+	@Column
 	private Date lastSeen;
 
 	@Valid
-	private List<Item> incomes;
+	private String incomes;
 
 	@Valid
-	private List<Item> expenses;
+	private String expenses;
 
 	@Valid
 	@NotNull
-	private Saving saving;
+	private String saving;
 
 	@Length(min = 0, max = 20_000)
 	private String note;
@@ -49,27 +51,27 @@ public class Account {
 		this.lastSeen = lastSeen;
 	}
 
-	public List<Item> getIncomes() {
+	public String getIncomes() {
 		return incomes;
 	}
 
-	public void setIncomes(List<Item> incomes) {
+	public void setIncomes(String incomes) {
 		this.incomes = incomes;
 	}
 
-	public List<Item> getExpenses() {
+	public String getExpenses() {
 		return expenses;
 	}
 
-	public void setExpenses(List<Item> expenses) {
+	public void setExpenses(String expenses) {
 		this.expenses = expenses;
 	}
 
-	public Saving getSaving() {
+	public String getSaving() {
 		return saving;
 	}
 
-	public void setSaving(Saving saving) {
+	public void setSaving(String saving) {
 		this.saving = saving;
 	}
 

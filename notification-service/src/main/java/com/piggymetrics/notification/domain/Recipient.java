@@ -1,17 +1,22 @@
 package com.piggymetrics.notification.domain;
 
 import org.hibernate.validator.constraints.Email;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 
-@Document(collection = "recipients")
+@Entity
 public class Recipient {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int id;
+
 	private String accountName;
 
 	@NotNull
@@ -19,7 +24,7 @@ public class Recipient {
 	private String email;
 
 	@Valid
-	private Map<NotificationType, NotificationSettings> scheduledNotifications;
+	private String scheduledNotifications;
 
 	public String getAccountName() {
 		return accountName;
@@ -37,11 +42,11 @@ public class Recipient {
 		this.email = email;
 	}
 
-	public Map<NotificationType, NotificationSettings> getScheduledNotifications() {
+	public String getScheduledNotifications() {
 		return scheduledNotifications;
 	}
 
-	public void setScheduledNotifications(Map<NotificationType, NotificationSettings> scheduledNotifications) {
+	public void setScheduledNotifications(String scheduledNotifications) {
 		this.scheduledNotifications = scheduledNotifications;
 	}
 

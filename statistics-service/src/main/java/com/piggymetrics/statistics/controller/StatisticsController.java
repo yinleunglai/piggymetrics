@@ -1,5 +1,6 @@
 package com.piggymetrics.statistics.controller;
 
+import com.google.gson.Gson;
 import com.piggymetrics.statistics.domain.Account;
 import com.piggymetrics.statistics.domain.timeseries.DataPoint;
 import com.piggymetrics.statistics.service.StatisticsService;
@@ -30,7 +31,11 @@ public class StatisticsController {
 
 	@PreAuthorize("#oauth2.hasScope('server')")
 	@RequestMapping(value = "/{accountName}", method = RequestMethod.PUT)
-	public void saveAccountStatistics(@PathVariable String accountName, @Valid @RequestBody Account account) {
-		statisticsService.save(accountName, account);
+	public void saveAccountStatistics(@PathVariable String accountName, @Valid @RequestBody String account) {
+
+	  Account account1 = new Gson().fromJson(account, Account.class);
+
+
+		statisticsService.save(accountName, account1);
 	}
 }

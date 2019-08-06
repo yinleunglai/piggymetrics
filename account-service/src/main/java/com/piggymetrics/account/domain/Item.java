@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 public class Item {
 
+
 	@NotNull
 	@Length(min = 1, max = 20)
 	private String title;

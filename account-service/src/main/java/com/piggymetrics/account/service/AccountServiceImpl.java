@@ -1,11 +1,10 @@
 package com.piggymetrics.account.service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.piggymetrics.account.client.AuthServiceClient;
 import com.piggymetrics.account.client.StatisticsServiceClient;
-import com.piggymetrics.account.domain.Account;
-import com.piggymetrics.account.domain.Currency;
-import com.piggymetrics.account.domain.Saving;
-import com.piggymetrics.account.domain.User;
+import com.piggymetrics.account.domain.*;
 import com.piggymetrics.account.repository.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -34,7 +34,7 @@ public class AccountServiceImpl implements AccountService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Account findByName(String accountName) {
+	public Accountinfo findByName(String accountName) {
 		Assert.hasLength(accountName);
 		return repository.findByName(accountName);
 	}
@@ -43,10 +43,10 @@ public class AccountServiceImpl implements AccountService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Account create(User user) {
+	public Accountinfo create(User user) {
 
-		Account existing = repository.findByName(user.getUsername());
-		Assert.isNull(existing, "account already exists: " + user.getUsername());
+		Accountinfo existing = repository.findByName(user.getUserName());
+		Assert.isNull(existing, "account already exists: " + user.getUserName());
 
 		authClient.createUser(user);
 
@@ -57,10 +57,12 @@ public class AccountServiceImpl implements AccountService {
 		saving.setDeposit(false);
 		saving.setCapitalization(false);
 
-		Account account = new Account();
-		account.setName(user.getUsername());
+		Accountinfo account = new Accountinfo();
+		account.setName(user.getUserName());
 		account.setLastSeen(new Date());
-		account.setSaving(saving);
+
+		Gson gson = new Gson();
+		account.setSaving(gson.toJson(saving));
 
 		repository.save(account);
 
@@ -73,20 +75,22 @@ public class AccountServiceImpl implements AccountService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void saveChanges(String name, Account update) {
+	public void saveChanges(String name, Accountinfo update) {
 
-		Account account = repository.findByName(name);
+		Accountinfo account = repository.findByName(name);
 		Assert.notNull(account, "can't find account with name " + name);
 
 		account.setIncomes(update.getIncomes());
 		account.setExpenses(update.getExpenses());
-		account.setSaving(update.getSaving());
-		account.setNote(update.getNote());
 		account.setLastSeen(new Date());
+		account.setNote(update.getNote());
+		account.setSaving(update.getSaving());
+
 		repository.save(account);
 
 		log.debug("account {} changes has been saved", name);
 
-		statisticsClient.updateStatistics(name, account);
+		//TODO set account
+		statisticsClient.updateStatistics(name, new Gson().toJson(account));
 	}
 }

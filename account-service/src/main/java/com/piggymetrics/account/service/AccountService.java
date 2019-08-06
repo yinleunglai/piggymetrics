@@ -1,6 +1,7 @@
 package com.piggymetrics.account.service;
 
 import com.piggymetrics.account.domain.Account;
+import com.piggymetrics.account.domain.Accountinfo;
 import com.piggymetrics.account.domain.User;
 
 public interface AccountService {
@@ -11,7 +12,7 @@ public interface AccountService {
 	 * @param accountName
 	 * @return found account
 	 */
-	Account findByName(String accountName);
+	Accountinfo findByName(String accountName);
 
 	/**
 	 * Checks if account with the same name already exists
@@ -21,7 +22,7 @@ public interface AccountService {
 	 * @param user
 	 * @return created account
 	 */
-	Account create(User user);
+	Accountinfo create(User user);
 
 	/**
 	 * Validates and applies incoming account updates
@@ -30,5 +31,5 @@ public interface AccountService {
 	 * @param name
 	 * @param update
 	 */
-	void saveChanges(String name, Account update);
+	void saveChanges(String name, Accountinfo update);
 }

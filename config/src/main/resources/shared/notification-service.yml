@@ -2,7 +2,7 @@ security:
   oauth2:
     client:
       clientId: notification-service
-      clientSecret: ${NOTIFICATION_SERVICE_PASSWORD}
+      clientSecret: 123456
       accessTokenUri: http://auth-service:5000/uaa/oauth/token
       grant-type: client_credentials
       scope: server
@@ -10,7 +10,7 @@ security:
 server:
   servlet:
     context-path: /notifications
-  port: 8000
+  port: 8099
 
 remind:
   cron: 0 0 0 * * *
@@ -26,13 +26,22 @@ backup:
     attachment: backup.json
 
 spring:
-  data:
-    mongodb:
-      host: notification-mongodb
-      username: user
-      password: ${MONGODB_PASSWORD}
-      database: piggymetrics
-      port: 27017
+  jackson:
+    serialization-inclusion: non_null
+    #Pretty-print JSON responses
+    serialization.indent_output: true
+  jpa:
+    properties.hibernate:
+      hbm2ddl.auto: update
+      dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: false
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://notification-mysql:3306/piggymetrics?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: simon
+    password: 123456
+
   mail:
     host: smtp.gmail.com
     port: 465

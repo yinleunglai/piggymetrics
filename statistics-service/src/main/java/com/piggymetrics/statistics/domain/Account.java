@@ -1,49 +1,47 @@
 package com.piggymetrics.statistics.domain;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
-@Document(collection = "accounts")
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Account {
 
 	@Valid
 	@NotNull
-	private List<Item> incomes;
+	private String incomes;
 
 	@Valid
 	@NotNull
-	private List<Item> expenses;
+	private String expenses;
 
 	@Valid
 	@NotNull
-	private Saving saving;
+	private String saving;
 
-	public List<Item> getIncomes() {
+	public String getIncomes() {
 		return incomes;
 	}
 
-	public void setIncomes(List<Item> incomes) {
+	public void setIncomes(String incomes) {
 		this.incomes = incomes;
 	}
 
-	public List<Item> getExpenses() {
+	public String getExpenses() {
 		return expenses;
 	}
 
-	public void setExpenses(List<Item> expenses) {
+	public void setExpenses(String expenses) {
 		this.expenses = expenses;
 	}
 
-	public Saving getSaving() {
+	public String getSaving() {
 		return saving;
 	}
 
-	public void setSaving(Saving saving) {
+	public void setSaving(String saving) {
 		this.saving = saving;
 	}
 }

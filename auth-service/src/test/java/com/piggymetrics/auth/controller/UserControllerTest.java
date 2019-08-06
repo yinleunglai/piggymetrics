@@ -45,8 +45,8 @@ public class UserControllerTest {
 	public void shouldCreateNewUser() throws Exception {
 
 		final User user = new User();
-		user.setUsername("test");
-		user.setPassword("password");
+		user.setUserName("test");
+		user.setPassWord("password");
 
 		String json = mapper.writeValueAsString(user);
 
@@ -58,8 +58,8 @@ public class UserControllerTest {
 	public void shouldFailWhenUserIsNotValid() throws Exception {
 
 		final User user = new User();
-		user.setUsername("t");
-		user.setPassword("p");
+		user.setUserName("t");
+		user.setPassWord("p");
 
 		mockMvc.perform(post("/users"))
 				.andExpect(status().isBadRequest());

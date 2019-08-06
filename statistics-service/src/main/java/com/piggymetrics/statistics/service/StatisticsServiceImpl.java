@@ -1,6 +1,10 @@
 package com.piggymetrics.statistics.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.piggymetrics.statistics.domain.*;
 import com.piggymetrics.statistics.domain.timeseries.DataPoint;
 import com.piggymetrics.statistics.domain.timeseries.DataPointId;
@@ -41,7 +45,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 	@Override
 	public List<DataPoint> findByAccountName(String accountName) {
 		Assert.hasLength(accountName);
-		return repository.findByIdAccount(accountName);
+		return repository.getDataPointList(accountName);
 	}
 
 	/**
@@ -55,22 +59,38 @@ public class StatisticsServiceImpl implements StatisticsService {
 
 		DataPointId pointId = new DataPointId(accountName, Date.from(instant));
 
-		Set<ItemMetric> incomes = account.getIncomes().stream()
+
+		Gson gson = new Gson();
+
+		List<Item> incomesList = gson.fromJson(account.getIncomes(), new TypeToken<List<Item>>() {}.getType());
+		List<Item>expensesList = gson.fromJson(account.getExpenses(), new TypeToken<List<Item>>() {}.getType());
+		Saving saving = gson.fromJson(account.getSaving(), Saving.class);
+        //TODO
+		Set<ItemMetric> incomes = incomesList.stream()
 				.map(this::createItemMetric)
 				.collect(Collectors.toSet());
 
-		Set<ItemMetric> expenses = account.getExpenses().stream()
+		Set<ItemMetric> expenses = expensesList.stream()
 				.map(this::createItemMetric)
 				.collect(Collectors.toSet());
 
-		Map<StatisticMetric, BigDecimal> statistics = createStatisticMetrics(incomes, expenses, account.getSaving());
+		Map<StatisticMetric, BigDecimal> statistics = createStatisticMetrics(incomes, expenses, saving);
+
+		ObjectMapper mapper = new ObjectMapper(); //转换器
+
 
 		DataPoint dataPoint = new DataPoint();
-		dataPoint.setId(pointId);
-		dataPoint.setIncomes(incomes);
-		dataPoint.setExpenses(expenses);
-		dataPoint.setStatistics(statistics);
-		dataPoint.setRates(ratesService.getCurrentRates());
+		try {
+		    dataPoint.setIncomes(mapper.writeValueAsString(incomes));
+			dataPoint.setExpenses(mapper.writeValueAsString(expenses));
+			dataPoint.setStatistics(mapper.writeValueAsString(statistics));
+			dataPoint.setRates(mapper.writeValueAsString(ratesService.getCurrentRates()));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		dataPoint.setAccount(accountName);
+		dataPoint.setDate(Date.from(instant));
+
 
 		log.debug("new datapoint has been created: {}", pointId);
 

@@ -1,68 +1,80 @@
 package com.piggymetrics.statistics.domain.timeseries;
 
-import com.piggymetrics.statistics.domain.Currency;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.util.Date;
 
 /**
  * Represents daily time series data point containing
  * current account state
  */
-@Document(collection = "datapoints")
+@Entity
 public class DataPoint {
 
 	@Id
-	private DataPointId id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int id;
 
-	private Set<ItemMetric> incomes;
+	private String account;
 
-	private Set<ItemMetric> expenses;
+	private Date date;
 
-	private Map<StatisticMetric, BigDecimal> statistics;
+	private String incomes;
 
-	private Map<Currency, BigDecimal> rates;
+	private String expenses;
 
-	public DataPointId getId() {
-		return id;
+	private String statistics;
+
+	private String rates;
+
+
+	public String getAccount() {
+		return account;
 	}
 
-	public void setId(DataPointId id) {
-		this.id = id;
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
-	public Set<ItemMetric> getIncomes() {
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public String getIncomes() {
 		return incomes;
 	}
 
-	public void setIncomes(Set<ItemMetric> incomes) {
+	public void setIncomes(String incomes) {
 		this.incomes = incomes;
 	}
 
-	public Set<ItemMetric> getExpenses() {
+	public String getExpenses() {
 		return expenses;
 	}
 
-	public void setExpenses(Set<ItemMetric> expenses) {
+	public void setExpenses(String expenses) {
 		this.expenses = expenses;
 	}
 
-	public Map<StatisticMetric, BigDecimal> getStatistics() {
+	public String getStatistics() {
 		return statistics;
 	}
 
-	public void setStatistics(Map<StatisticMetric, BigDecimal> statistics) {
+	public void setStatistics(String statistics) {
 		this.statistics = statistics;
 	}
 
-	public Map<Currency, BigDecimal> getRates() {
+	public String getRates() {
 		return rates;
 	}
 
-	public void setRates(Map<Currency, BigDecimal> rates) {
+	public void setRates(String rates) {
 		this.rates = rates;
 	}
 }

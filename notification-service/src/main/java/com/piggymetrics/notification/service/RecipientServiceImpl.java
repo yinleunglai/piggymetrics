@@ -1,16 +1,22 @@
 package com.piggymetrics.notification.service;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.piggymetrics.notification.domain.NotificationSettings;
 import com.piggymetrics.notification.domain.NotificationType;
 import com.piggymetrics.notification.domain.Recipient;
 import com.piggymetrics.notification.repository.RecipientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RecipientServiceImpl implements RecipientService {
@@ -33,7 +39,10 @@ public class RecipientServiceImpl implements RecipientService {
 	public Recipient save(String accountName, Recipient recipient) {
 
 		recipient.setAccountName(accountName);
-		recipient.getScheduledNotifications().values()
+
+
+
+		getNotificationsMap(recipient.getScheduledNotifications()).values()
 				.forEach(settings -> {
 					if (settings.getLastNotified() == null) {
 						settings.setLastNotified(new Date());
@@ -67,7 +76,14 @@ public class RecipientServiceImpl implements RecipientService {
 	 */
 	@Override
 	public void markNotified(NotificationType type, Recipient recipient) {
-		recipient.getScheduledNotifications().get(type).setLastNotified(new Date());
+		getNotificationsMap(recipient.getScheduledNotifications()).get(type).setLastNotified(new Date());
 		repository.save(recipient);
+	}
+
+	public Map<NotificationType, NotificationSettings> getNotificationsMap(String jsonStr) {
+		Gson gson = new Gson();
+		Map<NotificationType, NotificationSettings> notificationsMap =
+				gson.fromJson(jsonStr, new TypeToken<Map<NotificationType, NotificationSettings>>() {}.getType());
+		return notificationsMap;
 	}
 }

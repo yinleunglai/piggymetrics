@@ -1,15 +1,18 @@
 #!/bin/bash
 if test -z "$MONGODB_PASSWORD"; then
     echo "MONGODB_PASSWORD not defined"
-    exit 1
+    echo "$MONGODB_PASSWORD"
+    exit
+
 fi
 
-auth="-u user -p $MONGODB_PASSWORD"
+
+auth="-u user -p 123456"
 
 # MONGODB USER CREATION
 (
 echo "setup mongodb auth"
-create_user="if (!db.getUser('user')) { db.createUser({ user: 'user', pwd: '$MONGODB_PASSWORD', roles: [ {role:'readWrite', db:'piggymetrics'} ]}) }"
+create_user="if (!db.getUser('user')) { db.createUser({ user: 'user', pwd: '123456', roles: [ {role:'readWrite', db:'piggymetrics'} ]}) }"
 until mongo piggymetrics --eval "$create_user" || mongo piggymetrics $auth --eval "$create_user"; do sleep 5; done
 killall mongod
 sleep 1
@@ -31,3 +34,5 @@ gosu mongodb mongod "$@"
 echo "restarting with auth on"
 sleep 5
 exec gosu mongodb /usr/local/bin/docker-entrypoint.sh --auth "$@"
+
+
